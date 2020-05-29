@@ -1,29 +1,34 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-  <meta charset='utf-8' />
-  <title></title>
-  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
-  <script src="https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.js"></script>
-  <link href="https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.css" rel="stylesheet" />
-  <script src='https://npmcdn.com/csv2geojson@latest/csv2geojson.js'></script>
-  <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Testing Cody's Map</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.css" rel="stylesheet" />
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
+    <link rel="stylesheet" href="style.css">
+
+  </head>
   <style>
     body {
+      background: #404040;
       margin: 0;
       padding: 0;
     }
 
+
     #map {
+      border-left: 1px solid #fff;
       position: absolute;
+      width: 100%;
       top: 0;
       bottom: 0;
-      width: 100%;
     }
 
-    /* Popup styling */
 
     .mapboxgl-popup {
       padding-bottom: 5px;
@@ -36,7 +41,7 @@
     .mapboxgl-popup-content {
       font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
       padding: 0;
-      width: 250px;
+      width: 350px;
     }
 
     .mapboxgl-popup-content-wrapper {
@@ -72,117 +77,76 @@
     .mapboxgl-popup-anchor-top>.mapboxgl-popup-tip {
       border-bottom-color: rgb(61, 59, 59);
     }
+
   </style>
-</head>
 
-<body>
+  <body>
 
-  <div id='map'></div>
-  <script>
-
-    var transformRequest = (url, resourceType) => {
-      var isMapboxRequest =
-        url.slice(8, 22) === "api.mapbox.com" ||
-        url.slice(10, 26) === "tiles.mapbox.com";
-      return {
-        url: isMapboxRequest
-          ? url.replace("?", "?pluginName=sheetMapper&")
-          : url
+    <div id="map"></div>
+    <script>
+      var transformRequest = (url, resourceType) => {
+        var isMapboxRequest =
+          url.slice(8, 22) === "api.mapbox.com" ||
+          url.slice(10, 26) === "tiles.mapbox.com";
+        return {
+          url: isMapboxRequest
+            ? url.replace("?", "?pluginName=sheetMapper&")
+            : url
+        };
       };
-    };
-    //YOUR TURN: add your Mapbox token 
-    mapboxgl.accessToken = 'pk.eyJ1IjoibGVlanVuZGRhcmkiLCJhIjoiY2thYXdxYjh6MHI5ZzJxa2hsejRyMTFnMyJ9._5F3Mqj7QmtTwRjKTlZhbw'; //Mapbox token 
-    var map = new mapboxgl.Map({
-      container: 'map', // container id
-      style: 'mapbox://styles/leejunddari/ckarocjce0nzk1ileaetrokwo', //stylesheet location
-      center: [126.981, 37.570], // starting position
-      zoom: 10,// starting zoom
-      transformRequest: transformRequest
-    });
 
-    $(document).ready(function () {
-      $.ajax({
-        type: "GET",
-        //YOUR TURN: Replace with csv export link
-        url: 'https://docs.google.com/spreadsheets/d/1Knsri_6aFjQ70_XoIuI0Rn6P9nVA1hc40LvQn2MIQc4/edit?usp=sharing',
-        dataType: "text",
-        success: function (csvData) { makeGeoJSON(csvData); }
+      //YOUR TURN: add your Mapbox access token 
+      mapboxgl.accessToken = 'pk.eyJ1IjoibGVlanVuZGRhcmkiLCJhIjoiY2thYXdxYjh6MHI5ZzJxa2hsejRyMTFnMyJ9._5F3Mqj7QmtTwRjKTlZhbw';
+      var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: "mapbox://styles/leejunddari/ckarocjce0nzk1ileaetrokwo", //YOUR TURN: choose a style: https://docs.mapbox.com/api/maps/#styles
+        center: [126.9799971, 37.5688492], // starting position [lng, lat]
+        zoom: 9, // starting zoom
+        transformRequest: transformRequest
       });
 
 
+      map.on("load", function() {
+        init();
+      });
 
-      function makeGeoJSON(csvData) {
-        csv2geojson.csv2geojson(csvData, {
-          latfield: 'Latitude',
-          lonfield: 'Longitude',
-          delimiter: ','
-        }, function (err, data) {
-          map.on('load', function () {
-
-            //Add the the layer to the map 
-            map.addLayer({
-              'id': 'csvData',
-              'type': 'circle',
-              'source': {
-                'type': 'geojson',
-                'data': data
-              },
-              'paint': {
-                'circle-radius': 5,
-                'circle-color': "purple"
-              }
-            });
+      // Initialize Tabletop to access your table
+      function init() {
+        Tabletop.init({
+          // YOUR TURN: change 'key' value to point to your spreadsheet
+          key: 'https://docs.google.com/spreadsheets/d/1Knsri_6aFjQ70_XoIuI0Rn6P9nVA1hc40LvQn2MIQc4/edit?usp=sharing',
+          // once Tabletop has loaded the data, it passes it to the 'callback' function, 'addPoints', defined below
+          callback: addPoints,
+          simpleSheet: true
+        });
+      }
 
 
-            // When a click event occurs on a feature in the csvData layer, open a popup at the
-            // location of the feature, with description HTML from its properties.
-            map.on('click', 'csvData', function (e) {
-              var coordinates = e.features[0].geometry.coordinates.slice();
+      // create a function called addPoints that iterates through your table (row by row) to create markers and popups
+      function addPoints(data) {
 
-              //set popup text 
-              //You can adjust the values of the popup to match the headers of your CSV. 
-              // For example: e.features[0].properties.Name is retrieving information from the field Name in the original CSV. 
-              var description = `<h3>` + e.features[0].properties.Name + `</h3>` + `<h4>` + `<b>` + `Gu: ` + `</b>` + e.features[0].properties.Gu + `</h4>` +`<h4>` + `<b>` + `RoadSN: ` + `</b>` + e.features[0].properties.RoadSN + `</h4>`+`<h4>` + `<b>` + `TreeId: ` + `</b>` + e.features[0].properties.TreeId + `</h4>`+`<h4>` + `<b>` + `Species: ` + `</b>` + e.features[0].properties.Species + `</h4>`+`<h4>` + `<b>` + `DBH: ` + `</b>` + e.features[0].properties.DBH + `</h4>`+`<h4>` + `<b>` + `CondLvs: ` + `</b>` + e.features[0].properties.CondLvs + `</h4>`+`<h4>` + `<b>` + `CondWood: ` + `</b>` + e.features[0].properties.CondWood + `</h4>`;
+        // iterate through your table to set the marker to lat/long values for each row
 
-              // Ensure that if the map is zoomed out such that multiple
-              // copies of the feature are visible, the popup appears
-              // over the copy being pointed to.
-              while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-              }
+        data.forEach(function(row) {
 
-              //add Popup to map
+          // create a variable for your popup and populate your popup with information from your table
+          var popup = new mapboxgl.Popup()
+            .setHTML(`<h3>` + row.Species + `</h3>` + '<h4>' + '<b>' + 'DBH: ' + '</b>' + row.DBH + '</h4>' + '<h4>' + '<b>' + 'CondLvs: ' + '</b>' + row.CondLvs + '</h4>' + '<h4>' + '<b>' + 'CondWood: ' + '</b>' + row.CondWood + '</h4>'); // use the table to populate your popup with text
 
-              new mapboxgl.Popup()
-                .setLngLat(coordinates)
-                .setHTML(description)
-                .addTo(map);
-            });
 
-            // Change the cursor to a pointer when the mouse is over the places layer.
-            map.on('mouseenter', 'csvData', function () {
-              map.getCanvas().style.cursor = 'pointer';
-            });
+          // create a variable for your markup and add it to the map 
+          var marker = new mapboxgl.Marker({
+              color: 'purple'
+            })
+            .setLngLat([row.Longitude, row.Latitude])
+            .setPopup(popup)
+            .addTo(map); // add the marker to the map
 
-            // Change it back to a pointer when it leaves.
-            map.on('mouseleave', 'places', function () {
-              map.getCanvas().style.cursor = '';
-            });
-
-            var bbox = turf.bbox(data);
-            map.fitBounds(bbox, { padding: 50 });
-
-          });
 
         });
-      };
-    });
+      }
 
-
-
-
-  </script>
-
-</body>
+    </script>
+  </body>
 
 </html>
