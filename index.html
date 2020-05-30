@@ -131,7 +131,7 @@
 
           // create a variable for your popup and populate your popup with information from your table
           var popup = new mapboxgl.Popup()
-            .setHTML(`<h3>` + row.Species_kor + `</h3>` + '<h4>' + '<b>' + 'DBH: ' + '</b>' + row.DBH + '</h4>' + '<h4>' + '<b>' + 'Condtion: ' + '</b>' + row.CrownCondition + '</h4>' + '<h4>' + '<b>' + 'Species: ' + '</b>' + row.Species + '</h4>' + '<h4>' + '<b>' + 'ID: ' + '</b>' + row.ID + '</h4>'); // use the table to populate your popup with text
+            .setHTML(`<h3>` + row.Species_kor + `</h3>` + '<h4>' + '<b>' + '날짜: ' + '</b>' + row.Survey_Date + '</h4>' +'<h4>' + '<b>' + '흉고직경: ' + '</b>' + row.DBH + '</h4>' + '<h4>' + '<b>' + '컨디션: ' + '</b>' + row.CrownCondition + '</h4>' + '<h4>' + '<b>' + 'ID: ' + '</b>' + row.ID + '</h4>'); // use the table to populate your popup with text
 
 
           // create a variable for your markup and add it to the map 
