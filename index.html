@@ -101,9 +101,11 @@
         container: 'map', // container id
         style: "mapbox://styles/leejunddari/ckarocjce0nzk1ileaetrokwo", //YOUR TURN: choose a style: https://docs.mapbox.com/api/maps/#styles
         center: [126.9799971, 37.5688492], // starting position [lng, lat]
-        zoom: 12, // starting zoom
+        zoom: 11, // starting zoom
         transformRequest: transformRequest
       });
+      
+      map.addControl(new mapboxgl.NavigationControl());
 
 
       map.on("load", function() {
@@ -136,7 +138,7 @@
 
           // create a variable for your markup and add it to the map 
           var marker = new mapboxgl.Marker({
-              color: 'purple'
+              color: 'green'
             })
             .setLngLat([row.Longitude, row.Latitude])
             .setPopup(popup)
